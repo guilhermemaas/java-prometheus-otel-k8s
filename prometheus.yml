@@ -1,0 +1,7 @@
+global:
+  scrape_interval: 15s 
+
+scrape_configs:
+  - job_name: 'random-sites-api'
+    static_configs:
+      - targets: ['random-sites-api :1099']

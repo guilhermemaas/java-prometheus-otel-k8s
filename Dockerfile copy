@@ -1,0 +1,21 @@
+FROM maven:3.8.5-openjdk-17 AS build
+
+WORKDIR /app
+COPY pom.xml .
+COPY src ./src
+RUN mvn clean package -DskipTests
+
+FROM tomcat:10.1-jdk17
+COPY --from=build /app/target/*.jar /usr/local/tomcat/webapps/app.jar
+EXPOSE 8080
+
+ENV JAVA_OPTS="-Xms256m -Xmx512m -Dcom.sun.management.jmxremote \
+-Dcom.sun.management.jmxremote.port=1099 \
+-Dcom.sun.management.jmxremote.rmi.port=1099 \
+-Djava.rmi.server.hostname=localhost \
+-Dcom.sun.management.jmxremote.authenticate=false \
+-Dcom.sun.management.jmxremote.ssl=false"
+
+ENV JAVA_OPTS="$JAVA_OPTS -javaagent:/usr/local/tomcat/lib/jmx_prometheus_javaagent.jar=8081:/usr/local/tomcat/lib/jmx_exporter_config.yaml"
+
+CMD ["catalina.sh", "run"]

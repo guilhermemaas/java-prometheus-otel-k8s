@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  random-sites-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+      - "1099:1099"
+    volumes:
+      - ./tomcat-config/:/usr/local/tomcat/conf
+      - ./tomcat-config/jmx_prometheus_javaagent-0.16.1.jar:/usr/local/tomcat/lib/jmx_prometheus_javaagent.jar
+      - ./tomcat-config/jmx_exporter_config.yaml:/usr/local/tomcat/lib/jmx_exporter_config.yaml
+    networks:
+      - random-sites-api
+
+  prometheus:
+    image: prom/prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    depends_on:
+      - random-sites-api
+    networks:
+      - random-sites-api
+
+networks:
+  random-sites-api:

@@ -1,0 +1,29 @@
+<Server port="8005" shutdown="SHUTDOWN">
+    <Service name="Catalina">
+        <Connector port="8080" protocol="HTTP/1.1"
+                   maxThreads="200" 
+                   minSpareThreads="25" 
+                   maxHttpHeaderSize="8192" 
+                   enableLookups="false" 
+                   redirectPort="8443" 
+                   acceptCount="100" 
+                   connectionTimeout="20000" 
+                   compression="on" compressibleMimeType="text/html,text/xml,text/plain,text/css,text/javascript,text/json" />
+        
+        <Connector port="8443" protocol="org.apache.coyote.http11.Http11NioProtocol"
+                   maxThreads="200" 
+                   minSpareThreads="25" 
+                   maxHttpHeaderSize="8192" 
+                   SSLEnabled="true" 
+                   scheme="https" 
+                   secure="true" 
+                   clientAuth="none" />
+                   
+        <Engine name="Catalina" defaultHost="localhost">
+            <Host name="localhost" appBase="webapps"
+                  unpackWARs="true" autoDeploy="true">
+                <Context path="" docBase="ROOT" />
+            </Host>
+        </Engine>
+    </Service>
+</Server>           

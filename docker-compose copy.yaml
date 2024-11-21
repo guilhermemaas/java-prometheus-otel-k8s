@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  random-sites-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+      - "1099:1099"
+    environment:
+      - JAVA_OPTS=-Xms256m -Xmx512m -Dcom.sun.management.jmxremote \
+                  -Dcom.sun.management.jmxremote.port=1099 \
+                  -Dcom.sun.management.jmxremote.rmi.port=1099 \
+                  -Djava.rmi.server.hostname=localhost \
+                  -Dcom.sun.management.jmxremote.authenticate=false \
+                  -Dcom.sun.management.jmxremote.ssl=false \
+                  -javaagent:/usr/local/tomcat/lib/jmx_prometheus_javaagent.jar=8081:/usr/local/tomcat/lib/jmx_exporter_config.yaml
+    volumes:
+      - ./tomcat-config/:/usr/local/tomcat/conf
+      - ./tomcat-config/jmx_prometheus_javaagent-0.16.1.jar:/usr/local/tomcat/lib/jmx_prometheus_javaagent.jar
+      - ./tomcat-config/jmx_exporter_config.yaml:/usr/local/tomcat/lib/jmx_exporter_config.yaml
+    networks:
+      - random-sites-api
+
+  prometheus:
+    image: prom/prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    depends_on:
+      - random-sites-api
+    networks:
+      - random-sites-api
+
+networks:
+  random-sites-api:
